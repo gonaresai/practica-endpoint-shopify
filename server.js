@@ -32,7 +32,7 @@ pool.connect((err, client, release) => {
 // crear la tabla de productos si no existe
 async function crearTabla() {
   try {
-    await pool.query(\`
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS productos (
         id SERIAL PRIMARY KEY,
         titulo VARCHAR(500),
@@ -41,14 +41,14 @@ async function crearTabla() {
         url TEXT,
         fecha_scraping TIMESTAMP DEFAULT NOW()
       )
-    \`);
+    `);
     console.log("Tabla productos lista");
   } catch (err) {
     console.error("Error creando tabla:", err.message);
   }
 }
 
-// funcion para autenticarse en shopify (porque la tienda tiene contraseña)
+// funcion para autenticarse en shopify (porque la tienda tiene contraseÃ±a)
 async function loginShopify() {
   try {
     const pagina = await axios.get(SHOPIFY_URL + "/password", {
@@ -63,7 +63,7 @@ async function loginShopify() {
     const $ = cheerio.load(pagina.data);
     const token = $('input[name="authenticity_token"]').val() || $('form input[type="hidden"]').first().val();
 
-    // mandar la contraseña
+    // mandar la contraseÃ±a
     const login = await axios.post(
       SHOPIFY_URL + "/password",
       new URLSearchParams({
@@ -263,14 +263,16 @@ app.get("/", (req, res) => {
   });
 });
 
+// crear tabla al iniciar (funciona tanto local como en vercel)
+crearTabla();
+
 // iniciar el servidor (solo cuando corremos local, en vercel no hace falta)
 if (require.main === module) {
-  app.listen(PORT, async () => {
+  app.listen(PORT, () => {
     console.log("Servidor corriendo en http://localhost:" + PORT);
     console.log("Endpoints:");
     console.log("  GET /productos");
     console.log("  GET /scrape");
-    await crearTabla();
   });
 }
 
